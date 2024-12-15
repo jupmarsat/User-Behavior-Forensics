@@ -33,3 +33,14 @@ foreach ($task in $tasks) {
     Write-Host "Fetching $($task.Name)"
     Invoke-Expression $task.Command
 }
+
+# Create a ZIP file containing only the extracted files created by this script
+$zipPath = "C:\Temp\User_Artifacts.zip"
+$filesToZip = $tasks.FilePath
+if ($filesToZip) {
+    Write-Host "creating zip file containing extracted files..."
+    Compress-Archive -Path $filesToZip -DestinationPath $zipPath -Force
+    Write-Host "ZIP file created at $zipPath"
+} else {
+    Write-Host "No extracted files found to zip."
+}
