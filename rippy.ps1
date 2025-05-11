@@ -26,7 +26,9 @@ $tasks = @(
     @{ Name = "Winzip Archive"; FilePath = "C:\Temp\Winzip.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p winzip | Out-File -FilePath C:\Temp\Winzip.txt -Encoding utf8" },
     @{ Name = "Putty/SSH Keys"; FilePath = "C:\Temp\Putty.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p putty | Out-File -FilePath C:\Temp\Putty.txt -Encoding utf8" },
     @{ Name = "Terminal Server Client MRU"; FilePath = "C:\Temp\RemoteServers.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p tsclient | Out-File -FilePath C:\Temp\RemoteServers.txt -Encoding utf8" }
-)
+    @{ Name = "Sticky Notes"; FilePath = "C:\Temp\StickyNotes.csv"; Command = "Write-Host 'Reminder: Copy everything under %LOCALAPPDATA%\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState to a directory, then run StickyParser.py from https://github.com/dingtoffee/StickyParser. Ensure plum.sqlite and WAL/SHM files are in the same directory.'" },
+    @{ Name = "PSReadLine History"; FilePath = "C:\Temp\PowerShellHistory.txt"; Command = "Write-Host 'Reminder: Check the PSReadLine history file located at C:\Users\<Username>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt'" },
+   )
 
 
 # Run each plugin and save
@@ -45,3 +47,4 @@ if ($filesToZip) {
 } else {
     Write-Host "No extracted files found to zip."
 }
+Write-Host "Collection complete."
