@@ -25,9 +25,9 @@ $tasks = @(
     @{ Name = "Adobe"; FilePath = "C:\Temp\Adobe.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p adobe | Out-File -FilePath C:\Temp\Adobe.txt -Encoding utf8" },
     @{ Name = "Winzip Archive"; FilePath = "C:\Temp\Winzip.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p winzip | Out-File -FilePath C:\Temp\Winzip.txt -Encoding utf8" },
     @{ Name = "Putty/SSH Keys"; FilePath = "C:\Temp\Putty.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p putty | Out-File -FilePath C:\Temp\Putty.txt -Encoding utf8" },
-    @{ Name = "Terminal Server Client MRU"; FilePath = "C:\Temp\RemoteServers.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p tsclient | Out-File -FilePath C:\Temp\RemoteServers.txt -Encoding utf8" }
+    @{ Name = "Terminal Server Client MRU"; FilePath = "C:\Temp\RemoteServers.txt"; Command = "cmd.exe /c .\rip.exe -r .\NTUSER.dat -p tsclient | Out-File -FilePath C:\Temp\RemoteServers.txt -Encoding utf8" },
     @{ Name = "Sticky Notes"; FilePath = "C:\Temp\StickyNotes.csv"; Command = "Write-Host 'Reminder: Copy everything under %LOCALAPPDATA%\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState to a directory, then run StickyParser.py from https://github.com/dingtoffee/StickyParser. Ensure plum.sqlite and WAL/SHM files are in the same directory.'" },
-    @{ Name = "PSReadLine History"; FilePath = "C:\Temp\PowerShellHistory.txt"; Command = "Write-Host 'Reminder: Check the PSReadLine history file located at C:\Users\<Username>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt'" },
+    @{ Name = "PSReadLine History"; FilePath = "C:\Temp\PowerShellHistory.txt"; Command = "Write-Host 'Reminder: Check the PSReadLine history file located at C:\Users\<Username>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt'" }
    )
 
 
@@ -39,12 +39,24 @@ foreach ($task in $tasks) {
 
 # Create a ZIP file containing only the extracted files created by this script
 $zipPath = "C:\Temp\User_Artifacts.zip"
-$filesToZip = $tasks.FilePath
+$filesToZip = $tasks | Where-Object { Test-Path $_.FilePath } | ForEach-Object { $_.FilePath }
+
 if ($filesToZip) {
-    Write-Host "creating zip file containing extracted files..."
+    Write-Host "Creating zip file containing extracted files..."
     Compress-Archive -Path $filesToZip -DestinationPath $zipPath -Force
     Write-Host "ZIP file created at $zipPath"
+
+    # Remove the individual files after archiving
+    foreach ($file in $filesToZip) {
+        try {
+            Remove-Item -Path $file -Force
+            Write-Host "Deleted: $file"
+        } catch {
+            Write-Host ("Failed to delete {0}: {1}" -f $file, $_.Exception.Message)
+        }
+    }
 } else {
     Write-Host "No extracted files found to zip."
 }
+
 Write-Host "Collection complete."
